@@ -35,20 +35,6 @@ function createRow() {
   return row;
 };
 
-function createButton(text) {
-  let button = document.createElement("div");
-  button.classList.add("button");  
-  if (text.length > 4) {
-    button.style.width = "86px";
-  } else if (text === " ") {
-    button.style.width = "316px";
-  }
-  // if (text.length > 1 || text === "◄" || text === "▼" || text === "►" || text === "▲") {
-  //   button.style.backgroundColor = "#222222";    
-  // } 
-  button.innerText = text;
-  return button;
-};
 
 let symbol_rows = [
   ["`", 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, "-", "=", "Backspace"],
@@ -57,6 +43,36 @@ let symbol_rows = [
   ["Shift", ..."ZXCVBNM,./", "▲", "Shift"],
   ["Ctrl", "Win", "Alt", " ", "Alt", "◄", "▼", "►", "Ctrl"],
 ];
+
+let keyNames = new Map(Object.entries({"[": "BracketLeft", "]": "BracketRight", "\\": "Backslash", 
+                " ": "Space", "`": "Backquote", '/': "Slash", "'": "Quote",
+                ";": "Semicolon", ",": "Comma", ".": "Period", "-": "Minus",
+                "=": "Equal", "Del": "Delete", "◄": "ArrowLeft", 
+                "▼": "ArrowDown", "►": "ArrowRight", "▲": "ArrowUp"}));
+
+function createButton(text) {
+  let button = document.createElement("div");
+  button.classList.add("button");  
+  if (text.length > 4) {
+    button.style.width = "86px";
+  } else if (text === " ") {
+    button.style.width = "316px";
+  }  
+  if ("ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(text)) {
+    button.setAttribute("id", `Key${text}`);  
+  } else if ("0123456789".includes(text)) {
+    button.setAttribute("id", `Digit${text}`);  
+  } else if (keyNames.has(text)) {
+    button.setAttribute("id", keyNames.get(text));
+  } else {
+    button.setAttribute("id", text);
+  }
+  // if (text.length > 1 || text === "◄" || text === "▼" || text === "►" || text === "▲") {
+  //   button.style.backgroundColor = "#222222";    
+  // } 
+  button.innerText = text;
+  return button;
+};
 
 for (let symbol_row of symbol_rows) {
   let row = createRow();
@@ -75,7 +91,20 @@ function inputText(target) {
   }
 }
 */
-board.onclick = function(event) {
+
+let shiftButtons = Array.from(document.querySelectorAll("#Shift"));
+shiftButtons[0].setAttribute("id", "ShiftLeft");
+shiftButtons[1].setAttribute("id", "ShiftRight");
+
+let ctrlButtons = Array.from(document.querySelectorAll("#Ctrl"));
+ctrlButtons[0].setAttribute("id", "ControlLeft");
+ctrlButtons[1].setAttribute("id", "ControlRight");
+
+let altButtons = Array.from(document.querySelectorAll("#Alt"));
+altButtons[0].setAttribute("id", "AltLeft");
+altButtons[1].setAttribute("id", "AltRight");
+
+board.onmousedown = function(event) {
   let target = event.target;
   if (target.classList.contains('button')) {
     target.style.backgroundColor = "#2cfd72";
@@ -85,6 +114,14 @@ board.onclick = function(event) {
     }    
   }
 }
+
+board.onmouseup = function(event) {
+  let target = event.target;
+  if (target.classList.contains('button')) {
+    target.style.backgroundColor = "#444444";
+    target.style.borderRadius = "5px";
+  }
+}  
 /*
 let big_buttons = Array.from(document.querySelectorAll(".button"))
 big_buttons.addEventListener("click", {
@@ -92,4 +129,20 @@ big_buttons.addEventListener("click", {
   
 })
 */
+document.addEventListener('keydown', function(event) {
+  if (event.code == 'KeyZ' && (event.ctrlKey || event.metaKey)) {
+    alert('Отменить!')
+  }
+});
 
+// Описание в конце документа
+let description = document.createElement("div");
+description.classList.add("decription");
+
+let paragraph = document.createElement("p");
+paragraph.classList.add("paragraph");
+paragraph.innerText = `Клавиатура создана в операционной системе Windows\n
+Для переключения языка комбинация: левыe ctrl + alt`;
+
+document.body.appendChild(description);
+description.appendChild(paragraph);
