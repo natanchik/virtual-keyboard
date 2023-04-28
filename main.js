@@ -1,3 +1,5 @@
+// Add elements on the page
+
 let header = document.createElement("h1");
 header.classList.add("header");  
 header.innerText = "Virtual Keyboard";
@@ -12,6 +14,8 @@ document.body.appendChild(textarea);
 let board = document.createElement("div");
 board.classList.add("board"); 
 document.body.appendChild(board);
+
+// Create and add buttons on the keyboard
 
 function createRow() {
   let row = document.createElement("div");
@@ -30,8 +34,11 @@ let symbol_rows = [
 let keyNames = new Map(Object.entries({"[": "BracketLeft", "]": "BracketRight", 
     "\\": "Backslash", "`": "Backquote", '/': "Slash", "'": "Quote", ";": "Semicolon", 
     ",": "Comma", ".": "Period", "-": "Minus", "=": "Equal", "Del": "Delete", " ": "Space", 
-    "◄": "ArrowLeft", "▼": "ArrowDown", "►": "ArrowRight", "▲": "ArrowUp"}));    
+    "◄": "ArrowLeft", "▼": "ArrowDown", "►": "ArrowRight", "▲": "ArrowUp", "Win": "MetaLeft"}));    
 
+let isCapsLock = false;
+let isEng = true;
+    
 function createButton(text) {
   let button = document.createElement("div");
   button.classList.add("button");  
@@ -41,17 +48,22 @@ function createButton(text) {
     button.style.width = "316px";
   }  
   if ("ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(text)) {
-    button.setAttribute("id", `Key${text}`);  
+    button.setAttribute("id", `Key${text}`); 
+    button.classList.add("letters"); 
   } else if ("0123456789".includes(text)) {
-    button.setAttribute("id", `Digit${text}`);  
+    button.setAttribute("id", `Digit${text}`); 
+    button.classList.add("digits");  
   } else if (keyNames.has(text)) {
     button.setAttribute("id", keyNames.get(text));
+    if (text.length === 1 && text !== "◄" && text !== "▼" && text !==  "►" && text !== "▲") {
+      button.classList.add("symbols");  
+    } else {
+      button.classList.add("funcButtons");  
+    }
   } else {
     button.setAttribute("id", text);
-  }
-  // if (text.length > 1 || text === "◄" || text === "▼" || text === "►" || text === "▲") {
-  //   button.style.backgroundColor = "#222222";    
-  // } 
+    button.classList.add("funcButtons");  
+  }  
   button.innerText = text;
   return button;
 };
@@ -76,13 +88,28 @@ let altButtons = Array.from(document.querySelectorAll("#Alt"));
 altButtons[0].setAttribute("id", "AltLeft");
 altButtons[1].setAttribute("id", "AltRight");
 
+let buttonCaps = document.getElementById("CapsLock");
+
+// Add interactive
+
 board.onmousedown = function(event) {
   let target = event.target;
   if (target.classList.contains('button')) {
-    target.style.backgroundColor = "#2cfd72";
-    target.style.borderRadius = "50px";
-    if (target.innerText.length < 2) {
-      textarea.textContent += target.innerText;
+    target.classList.add("active");        
+    if (event.code === "CapsLock") {
+      isCapsLock = !isCapsLock;  
+    } else {
+      let text = "";  
+      if (target.innerText.length === 1) {
+        text = target.innerText;
+      } else if (target.innerText == "Enter") {
+        text = "\n"
+      } else if (target.innerText == "Tab") {
+        text = "\t"
+      } else if (target.innerText == "Space") {
+        text = " "
+      } 
+      textarea.textContent += text; 
     }    
   }
 }
@@ -90,39 +117,36 @@ board.onmousedown = function(event) {
 board.onmouseup = function(event) {
   let target = event.target;
   if (target.classList.contains('button')) {
-    target.style.backgroundColor = "#444444";
-    target.style.borderRadius = "5px";
-  }
+    if (target.innerText === "CapsLock") {
+      isCapsLock = !isCapsLock; 
+    } else {
+      target.classList.remove("active");                
+    }    
+  }  
 }  
-/*
-let big_buttons = Array.from(document.querySelectorAll(".button"))
-big_buttons.addEventListener("click", {
-  let button = event.target;  
-})
-*/
-document.addEventListener('keydown', function(event) {  
+
+document.addEventListener('keydown', function(event) {   
   let button = document.getElementById(event.code);  
-  button.style.backgroundColor = "#2cfd72";
-  button.style.borderRadius = "50px";
-  if (button.innerText.length < 2) {
-    textarea.textContent += button.innerText;
-  } 
+  button.classList.add("active"); 
+  if (event.code === "CapsLock") {
+    isCapsLock = !isCapsLock;  
+  }     
 });
 
 document.addEventListener('keyup', function(event) {  
   let button = document.getElementById(event.code);  
-  button.style.backgroundColor = "#444444";
-  button.style.borderRadius = "5px";  
+  button.classList.remove("active");   
 });
 
-// Описание в конце документа
+// Description in the end of document
+
 let description = document.createElement("div");
 description.classList.add("decription");
 
 let paragraph = document.createElement("p");
 paragraph.classList.add("paragraph");
 paragraph.innerText = `Клавиатура создана в операционной системе Windows\n
-Для переключения языка комбинация: левыe ctrl + alt`;
+Для переключения языка комбинация: левыe shift + alt`;
 
 document.body.appendChild(description);
 description.appendChild(paragraph);

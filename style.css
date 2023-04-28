@@ -55,11 +55,15 @@ body {
   transition: border-radius 0.3s, background-color 0.3s
 }
 
+.funcButtons {
+  background-color: #222222;
+}
+
 .button:hover {
   background: #79aa89;
 }
 
-.button:active {
+.button.active {
   background-color: #2cfd72;
   border-radius: 50px;
 }
