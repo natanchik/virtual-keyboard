@@ -3,10 +3,33 @@ body {
 }
 
 .header { 
-  font-size: "40px";
-  margin: "10px auto";
-  color: "#00bfff";
+  font-size: 40px;
+  margin: 20px auto;
+  color: #00bfff;
+  text-align: center;
 }
+
+.textarea {
+  display: block;
+  width: 700px;
+  height: 200px;
+  margin: 10px auto 10px;
+  padding: 10px;
+  font-size: 18px;
+  color: #444444;
+  overflow: auto;
+}
+  
+.board {
+  display: block;
+  width: 704px;
+  margin: 0 auto;
+  padding: 7px;  
+  background: #888888;
+  border: 3px solid #222222;
+  border-radius: 5px;
+}
+
 
 .row {
   clear: both;
@@ -39,10 +62,6 @@ body {
 .button:active {
   background-color: #2cfd72;
   border-radius: 50px;
-}
-
-.hidden {
-  display: none;
 }
 
 .decription {

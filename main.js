@@ -1,32 +1,16 @@
 let header = document.createElement("h1");
 header.classList.add("header");  
 header.innerText = "Virtual Keyboard";
-header.setAttribute("align", "center");
 document.body.appendChild(header);
 
 let textarea = document.createElement("textarea");
 textarea.classList.add("textarea"); 
 textarea.setAttribute("rows", "5");
 textarea.setAttribute("cols", "50");
-textarea.style.display = "block";
-textarea.style.width = "700px";
-textarea.style.height = "200px";
-textarea.style.margin = "10px auto 10px";
-textarea.style.padding = "10px";
-textarea.style.fontSize = "18px";
-textarea.style.color = "#444444";
-textarea.style.overflow = "auto";
 document.body.appendChild(textarea);
 
 let board = document.createElement("div");
 board.classList.add("board"); 
-board.style.display = "block";
-board.style.width = "700px";
-board.style.margin = "0 auto";
-board.style.padding = "5px";
-board.style.border = "#222222 solid 3px";
-board.style.borderRadius = "5px";
-board.style.background = "#888888";
 document.body.appendChild(board);
 
 function createRow() {
@@ -34,7 +18,6 @@ function createRow() {
   row.classList.add("row");  
   return row;
 };
-
 
 let symbol_rows = [
   ["`", 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, "-", "=", "Backspace"],
@@ -44,11 +27,10 @@ let symbol_rows = [
   ["Ctrl", "Win", "Alt", " ", "Alt", "◄", "▼", "►", "Ctrl"],
 ];
 
-let keyNames = new Map(Object.entries({"[": "BracketLeft", "]": "BracketRight", "\\": "Backslash", 
-                " ": "Space", "`": "Backquote", '/': "Slash", "'": "Quote",
-                ";": "Semicolon", ",": "Comma", ".": "Period", "-": "Minus",
-                "=": "Equal", "Del": "Delete", "◄": "ArrowLeft", 
-                "▼": "ArrowDown", "►": "ArrowRight", "▲": "ArrowUp"}));
+let keyNames = new Map(Object.entries({"[": "BracketLeft", "]": "BracketRight", 
+    "\\": "Backslash", "`": "Backquote", '/': "Slash", "'": "Quote", ";": "Semicolon", 
+    ",": "Comma", ".": "Period", "-": "Minus", "=": "Equal", "Del": "Delete", " ": "Space", 
+    "◄": "ArrowLeft", "▼": "ArrowDown", "►": "ArrowRight", "▲": "ArrowUp"}));    
 
 function createButton(text) {
   let button = document.createElement("div");
@@ -81,16 +63,6 @@ for (let symbol_row of symbol_rows) {
     row.appendChild(createButton(symbol));    
   }
 }
-/*
-function inputText(target) {
-  text = target.innerText;
-  if (text.length === 1) {
-    textarea.textContent += text;
-  } else if (text === "Backspace") {
-    textarea.textContent = textarea.textContent.slice(0, -1);
-  }
-}
-*/
 
 let shiftButtons = Array.from(document.querySelectorAll("#Shift"));
 shiftButtons[0].setAttribute("id", "ShiftLeft");
@@ -125,14 +97,22 @@ board.onmouseup = function(event) {
 /*
 let big_buttons = Array.from(document.querySelectorAll(".button"))
 big_buttons.addEventListener("click", {
-  let button = event.target;
-  
+  let button = event.target;  
 })
 */
-document.addEventListener('keydown', function(event) {
-  if (event.code == 'KeyZ' && (event.ctrlKey || event.metaKey)) {
-    alert('Отменить!')
-  }
+document.addEventListener('keydown', function(event) {  
+  let button = document.getElementById(event.code);  
+  button.style.backgroundColor = "#2cfd72";
+  button.style.borderRadius = "50px";
+  if (button.innerText.length < 2) {
+    textarea.textContent += button.innerText;
+  } 
+});
+
+document.addEventListener('keyup', function(event) {  
+  let button = document.getElementById(event.code);  
+  button.style.backgroundColor = "#444444";
+  button.style.borderRadius = "5px";  
 });
 
 // Описание в конце документа
