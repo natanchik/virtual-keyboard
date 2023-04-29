@@ -9,6 +9,7 @@ let textarea = document.createElement("textarea");
 textarea.classList.add("textarea"); 
 textarea.setAttribute("rows", "5");
 textarea.setAttribute("cols", "50");
+textarea.setAttribute("autofocus", "autofocus");
 document.body.appendChild(textarea);
 
 let board = document.createElement("div");
@@ -36,7 +37,7 @@ let keyNames = new Map(Object.entries({"[": "BracketLeft", "]": "BracketRight",
     ",": "Comma", ".": "Period", "-": "Minus", "=": "Equal", "Del": "Delete", " ": "Space", 
     "◄": "ArrowLeft", "▼": "ArrowDown", "►": "ArrowRight", "▲": "ArrowUp", "Win": "MetaLeft"}));    
 
-let isCapsLock = false;
+let isCapsLock = true;
 let isEng = true;
     
 function createButton(text) {
@@ -56,7 +57,13 @@ function createButton(text) {
   } else if (keyNames.has(text)) {
     button.setAttribute("id", keyNames.get(text));
     if (text.length === 1 && text !== "◄" && text !== "▼" && text !==  "►" && text !== "▲") {
-      button.classList.add("symbols");  
+      if (text === "-" || text === "=" || text === "\\") {
+        button.classList.add("digits");  
+      } else if (text === " ") {
+        button.classList.add("funcButtons");
+      }else {
+        button.classList.add("letters");  
+      }     
     } else {
       button.classList.add("funcButtons");  
     }
@@ -88,54 +95,101 @@ let altButtons = Array.from(document.querySelectorAll("#Alt"));
 altButtons[0].setAttribute("id", "AltLeft");
 altButtons[1].setAttribute("id", "AltRight");
 
-let buttonCaps = document.getElementById("CapsLock");
+let capsButton = document.getElementById("CapsLock");
+
+let allButtons = Array.from(document.querySelectorAll(".button"));
+let letters = Array.from(document.querySelectorAll(".letters"));
+let digits = Array.from(document.querySelectorAll(".digits"));
 
 // Add interactive
+
+function changeCase() {
+  isCapsLock = !isCapsLock;  
+  isCapsLock ? capsButton.classList.add("active") : capsButton.classList.remove("active");
+  for (let letter of letters) {
+    letter.innerText = isCapsLock ? letter.innerText.toUpperCase() : letter.innerText.toLowerCase(); 
+  }
+}
+
+changeCase()
+
+function changeLang() {
+  isEng = !isEng;  
+  let engLetters = [..."QWERTYUIOP[]ASDFGHJKL;'ZXCVBNM,.`/"];
+  let rusLetters = [..."ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮЁ."]; 
+  console.log(letters)
+  for (let letter of letters) {
+    if (!isEng) {
+      letter.innerText = rusLetters[engLetters.indexOf(letter.innerText)];
+    } else {
+      letter.innerText = engLetters[rusLetters.indexOf(letter.innerText)]; 
+    }    
+    letter.innerText = isCapsLock ? letter.innerText.toUpperCase() : letter.innerText.toLowerCase();    
+  }  
+}
+
+function inputText(target) {
+  let text = "";  
+  if (target.innerText.length === 1) {
+    text = target.innerText;
+  } else if (target.innerText == "Enter") {
+    text = "\n"
+  } else if (target.innerText == "Tab") {
+    text = "\t"
+  } else if (target.innerText == "Space") {
+    text = " "
+  } 
+  textarea.textContent += text; 
+}
 
 board.onmousedown = function(event) {
   let target = event.target;
   if (target.classList.contains('button')) {
     target.classList.add("active");        
     if (event.code === "CapsLock") {
-      isCapsLock = !isCapsLock;  
+      changeCase();      
+    } else if (event.altKey && event.shiftKey) {
+      changeLang();      
+    } else if (event.shiftKey) {      
+      allButtons.classList.add("shift");
     } else {
-      let text = "";  
-      if (target.innerText.length === 1) {
-        text = target.innerText;
-      } else if (target.innerText == "Enter") {
-        text = "\n"
-      } else if (target.innerText == "Tab") {
-        text = "\t"
-      } else if (target.innerText == "Space") {
-        text = " "
-      } 
-      textarea.textContent += text; 
-    }    
+      inputText(target);     
+    } 
+    console.log(target.innerText);   
   }
+  
 }
 
 board.onmouseup = function(event) {
   let target = event.target;
   if (target.classList.contains('button')) {
     if (target.innerText === "CapsLock") {
-      isCapsLock = !isCapsLock; 
+      changeCase();
     } else {
       target.classList.remove("active");                
+    }  
+    if (event.shiftKey) {      
+      allButtons.classList.remove("shift");
     }    
   }  
 }  
 
 document.addEventListener('keydown', function(event) {   
+  // event.preventDefault();
+  if (event.altKey && event.shiftKey) {
+    changeLang();
+  } else if (event.code === "CapsLock") {
+    changeCase(); 
+  }
   let button = document.getElementById(event.code);  
-  button.classList.add("active"); 
-  if (event.code === "CapsLock") {
-    isCapsLock = !isCapsLock;  
-  }     
+  button.classList.add("active");
+  console.log(button, button.innerText);
+  inputText(button);  
 });
 
 document.addEventListener('keyup', function(event) {  
   let button = document.getElementById(event.code);  
-  button.classList.remove("active");   
+  button.classList.remove("active");        
 });
 
 // Description in the end of document
